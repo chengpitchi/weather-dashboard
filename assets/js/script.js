@@ -1,6 +1,6 @@
 var apiKey = 'fba887dbfc1da151e8e5779421d09c56'
-var requestUrl = 'https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=' & apiKey; 
-
+//var requestUrl = 'https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=' & apiKey; 
+var requestUrl = 'https://api.github.com/orgs/nodejs/repos';
 
 fetch(requestUrl).then(function(response){
     console.log(response.status); 
