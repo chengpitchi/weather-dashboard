@@ -1,5 +1,5 @@
 var apiKey = 'fba887dbfc1da151e8e5779421d09c56'
-var requestURL = 'https://api.openweathermap.org/data/2.5/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid=' & apiKey; 
+var requestURL = 'http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid=' & apiKey; 
 
 fetch(requestURL).then(function(response){
     if (response.ok) {
