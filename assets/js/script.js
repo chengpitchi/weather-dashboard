@@ -1,5 +1,5 @@
 var apiKey = 'fba887dbfc1da151e8e5779421d09c56'
-var requestURL = 'https://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&appid=' & apiKey; 
+var requestURL = 'http://api.openweathermap.org/data/2.5/forecast?lat=44.34&lon=10.99&appid=' & apiKey; 
 
 fetch(requestURL).then(function(response){
     if (response.ok) {
