@@ -1,7 +1,9 @@
 var apiKey = 'fba887dbfc1da151e8e5779421d09c56'
-var requestURL = 'https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=' & apiKey; 
+var requestUrl = 'https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=' & apiKey; 
 
-fetch(requestURL).then(function(response){
+
+fetch(requestUrl).then(function(response){
+    console.log(response.status); 
     if (response.ok) {
         response.json().then(function(data){
             console.log(data); 
