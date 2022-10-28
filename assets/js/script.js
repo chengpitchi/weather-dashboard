@@ -29,7 +29,7 @@ function initPage() {
 }
 
 function renderRecentSearch() {
-    //reset the timeblock element
+    //reset the recent search elements
     historyButtonsEl.empty(); 
 
     if (recentSearchList !== null) {
@@ -71,7 +71,7 @@ function saveRecentSearch(city, state, country, lat, lon){
     recentSearchList.unshift(item); 
 
     if (recentSearchList.length > 1) {
-        // if there is an existing event for the same time, remove the old one from local storage
+        // if there is an existing item in recent search, remove the old one from local storage
         for (var i = 1; i < recentSearchList.length; i++) {
             if (recentSearchList[i].city == item.city && 
                 recentSearchList[i].state == item.state &&
@@ -83,7 +83,6 @@ function saveRecentSearch(city, state, country, lat, lon){
     }
 
     localStorage.setItem('recentSearch', JSON.stringify(recentSearchList)); 
-    //displayMessage('Event Information is saved successfully.'); 
 
     renderRecentSearch(); 
 }
@@ -138,7 +137,7 @@ function recentSearchClick(event) {
                     btnClicked.data('lon'), 
                     false);
     
-    document.location.replace('./index.html#search-result'); 
+    //document.location.replace('./index.html#search-result'); 
 }
 
 function searchWeather(cityName, state, country, lat, lon, saveHistory) {
