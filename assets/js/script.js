@@ -137,7 +137,7 @@ function recentSearchClick(event) {
                     btnClicked.data('lon'), 
                     false);
     
-    //document.location.replace('./index.html#search-result'); 
+    window.location.href = '#search-result'; 
 }
 
 function searchWeather(cityName, state, country, lat, lon, saveHistory) {
@@ -250,7 +250,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
 
                     if (saveHistory == true) {
                         saveRecentSearch(cityName, state, country, lat, lon); 
-                        document.location.replace('./index.html#search-result'); 
+                        window.location.href = '#search-result'; 
                     }
 
                     cityNameEl.val(''); 
