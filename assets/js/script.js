@@ -1,153 +1,319 @@
-var apiKey = 'fba887dbfc1da151e8e5779421d09c56'
-//var requestUrl = 'https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&appid=' & apiKey; 
-var requestUrl = 'https://api.github.com/orgs/nodejs/repos';
+var apiKey = '9373c8db95211ae85b982935247ac5be'
 
-fetch(requestUrl).then(function(response){
-    console.log(response.status); 
-    if (response.ok) {
-        response.json().then(function(data){
-            console.log(data); 
-        })
-    }
-})
+var expandIconEl = $('#expand-icon'); 
+var historyButtonsEl = $('#history-buttons'); 
+var recentSearchText = $('#recent-search-text'); 
+var searchButton = $('#search-btn'); 
+var recentSearchEl = $('#history-button'); 
+var forecast5daysEl = $('#forecast-5days'); 
+var currentForcastEl = $('.current-forecast'); 
+var cityNameEl = $('input[name=city-name]'); 
+var errorMessageEl = $('#error-message'); 
 
-var messageEl = $('#message-bar'); 
+var recentSearchList = new Array(); 
 
-var eventList = new Array(); 
+var lat = '0'; 
+var lon = '0'; 
 
 function initPage() {
-    // get the saved events in local storage and render the timeblock
-    //eventList = JSON.parse(localStorage.getItem("eventList"));
-
-    //renderSearchHist(); 
-}
-
-function renderSearchHist() {
-    //reset the timeblock element
-    //timeBlockEl.empty(); 
-/*
-    for(var i = 9; i <= 17; i++) {
-        var sectionEl = $('<section>')
-
-        // create hour column
-        sectionEl.addClass('row d-flex'); 
-        sectionEl.attr('data-hour', i); 
-        timeBlockEl.append(sectionEl); 
-
-        var hourEl = $('<div>'); 
-        hourEl.addClass('hour col-3 col-md-2 col-lg-1'); 
-        var hourTextEl = $('<p>'); 
-        hourTextEl.text(moment(i, 'HH').format("hA")); 
-        hourTextEl.attr('style', 'margin-top:40%'); 
-        hourEl.append(hourTextEl); 
-        sectionEl.append(hourEl); 
-
-        // create description column 
-        var descEl = $('<textarea>'); 
-
-        // populate the save event if any
-        if (eventList !== null) {
-            for (var j = 0; j < eventList.length; j++) {
-                if (eventList[j].date == moment().format('YYYYMMDD') && 
-                    eventList[j].hour == i) {
-                    descEl.text(eventList[j].desc); 
-                }
-            }
-        }
-
-        // set the background color based on the time 
-        if (moment().format('H') < i) {
-            descEl.addClass('description future col-6 col-md-8 col-lg-10'); 
-            descEl.attr('disabled', false); 
-            descEl.attr('style', 'color:blue'); 
-        } else if (moment().format('H') == i) {
-            descEl.addClass('description present col-6 col-md-8 col-lg-10');
-            descEl.attr('disabled', false);  
-        } else {
-            descEl.addClass('description past col-6 col-md-8 col-lg-10'); 
-            descEl.attr('disabled', true); 
-            descEl.attr('style', 'color:black'); 
-        }
-
-        sectionEl.append(descEl); 
-
-        // create the save button 
-        var saveEl = $('<button>'); 
-        saveEl.addClass('saveBtn col-3 col-md-2 col-lg-1'); 
-
-        var iconEl = $('<i>'); 
-        iconEl.addClass('fa fa-save'); 
-        iconEl.attr('style', 'color:white'); 
-        saveEl.append(iconEl); 
-        sectionEl.append(saveEl); 
-    }
-*/
-}
-
-function saveSearchHist(event){
-/*
-    var btnClicked = $(event.target);
-
+    // get the saved search history in local storage
+    recentSearchList = JSON.parse(localStorage.getItem("recentSearch"));
     
-    if (btnClicked.prop('localName') === 'button') {
-        // get values if the target is the button
-        var eventItem = {
-            hour: btnClicked.parent('section').data('hour'), 
-            desc: btnClicked.parent('section').children().eq(1).val().trim(), 
-            date: moment().format('YYYYMMDD')
+    var city = 'Adelaide'; 
+    var state = ''; 
+    var country = 'Australia'; 
+
+    getGeoCoding(city, state, country, false); 
+
+    renderRecentSearch(); 
+}
+
+function renderRecentSearch() {
+    //reset the timeblock element
+    historyButtonsEl.empty(); 
+
+    if (recentSearchList !== null) {
+        // show only 10 recent search results on the screen
+        for(let i = 0; i < ((recentSearchList.length < 10) ? recentSearchList.length : 10); i++) {
+            let buttonEl = $('<button>')
+            buttonEl.addClass('recent-btn button secondary'); 
+            buttonEl.attr('type', 'button'); 
+            buttonEl.attr('data-city', recentSearchList[i].city); 
+            buttonEl.attr('data-state', recentSearchList[i].state);
+            buttonEl.attr('data-country', recentSearchList[i].country); 
+            buttonEl.attr('data-lat', recentSearchList[i].lat); 
+            buttonEl.attr('data-lon', recentSearchList[i].lon); 
+
+            let cityString = ''; 
+
+            (recentSearchList[i].state == '') ?
+            cityString = `${recentSearchList[i].city}, ${recentSearchList[i].country}` :
+            cityString = `${recentSearchList[i].city}, ${recentSearchList[i].state}, ${recentSearchList[i].country}`; 
+
+            buttonEl.text(cityString);  
+
+            historyButtonsEl.append(buttonEl); 
         }
-    } else {
-        // get values if the target is the icon on the button 
-        var eventItem = {
-            hour: btnClicked.parent('button').parent('section').data('hour'), 
-            desc: btnClicked.parent('button').parent('section').children().eq(1).val().trim(), 
-            date: moment().format('YYYYMMDD')
-        }
     }
+}
 
-    // validate the input 
-    if (eventItem.hour < moment().format('H')) {
-        displayMessage('Cannot save past event.'); 
-        return; 
-    }
+function saveRecentSearch(city, state, country, lat, lon){
+    let item = {
+        city, 
+        state, 
+        country, 
+        lat, 
+        lon
+    }     
 
-    if (eventItem.desc === '') {
-        displayMessage('No input on the event description.')
-        return; 
-    }
+    if (recentSearchList === null) recentSearchList = new Array(); 
 
-    if (eventList === null) {
-        eventList = new Array(); 
-        eventList.push(eventItem);    
-    } else {
+    recentSearchList.unshift(item); 
+
+    if (recentSearchList.length > 1) {
         // if there is an existing event for the same time, remove the old one from local storage
-        for (var i = 0; i < eventList.length; i++) {
-            if (eventList[i].date == moment().format('YYYYMMDD') && 
-                eventList[i].hour == eventItem.hour) {
-                eventList.splice(i, 1); 
+        for (var i = 1; i < recentSearchList.length; i++) {
+            if (recentSearchList[i].city == item.city && 
+                recentSearchList[i].state == item.state &&
+                recentSearchList[i].country == item.country) {
+                recentSearchList.splice(i, 1); 
                 break; 
             }
         }
-
-        eventList.push(eventItem);
     }
 
-    localStorage.setItem('eventList', JSON.stringify(eventList)); 
-    displayMessage('Event Information is saved successfully.'); 
+    localStorage.setItem('recentSearch', JSON.stringify(recentSearchList)); 
+    //displayMessage('Event Information is saved successfully.'); 
 
-    renderSearchHist(); 
-*/
+    renderRecentSearch(); 
+}
+
+function searchButtonClick(event) {
+    event.preventDefault(); 
+
+    var cityName = ''; 
+    var state = ''; 
+    var country = '';
+
+    var nameArray = cityNameEl.val().trim().split(',');
+    
+    switch (nameArray.length) {
+        case 1:
+            cityName = nameArray[0].trim(); 
+            break; 
+        case 2:
+            cityName = nameArray[0].trim(); 
+            country = nameArray[1].trim(); 
+            break; 
+        case 3:
+            cityName = nameArray[0].trim(); 
+            country = nameArray[2].trim(); 
+            if (country == 'USA' || country == 'Canada') state = nameArray[1].trim(); 
+            break;
+    }
+
+    if (country == 'UK') country = 'GB'; 
+
+    if (country == 'Australia') {
+        var tempArr = cityName.split(' '); 
+        
+        cityName = ''; 
+        for (var i = 0; i < tempArr.length - 1; i++) {
+            cityName += tempArr[i] + ' '; 
+        }
+
+        cityName = cityName.trim(); 
+    }
+
+    getGeoCoding(cityName, state, country, true); 
+}
+
+function recentSearchClick(event) {
+    var btnClicked = $(event.target); 
+
+    searchWeather(btnClicked.data('city'), 
+                    btnClicked.data('state'), 
+                    btnClicked.data('country'), 
+                    btnClicked.data('lat'), 
+                    btnClicked.data('lon'), 
+                    false);
+    
+    document.location.replace('./index.html#search-result'); 
+}
+
+function searchWeather(cityName, state, country, lat, lon, saveHistory) {
+    var requestUrl = 'https://api.openweathermap.org/data/3.0/onecall?lat=' + lat + '&lon=' + lon + '&units=metric&exclude=hourly,minutely&appid=' + apiKey; 
+ 
+    fetch(requestUrl).then(function(response){
+        if (response.ok) {
+            response.json().then(function(data){                
+                currentForcastEl.empty(); 
+
+                let cityString = ''; 
+
+                (state == '') ?
+                cityString = `${cityName}, ${country}` :
+                cityString = `${cityName}, ${state}, ${country}`; 
+
+                var cityDateEl = $('<h2>'); 
+                cityDateEl.text(cityString + ' (' + moment(data.current.dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY hh:mm A") + ')'); 
+
+                var iconEl = $('<img>'); 
+                iconEl.attr('src', 'http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '.png')
+
+                var tempEl = $('<p>'); 
+                tempEl.text('Temp: ' + data.current.temp + String.fromCodePoint('8451'));
+                
+                var windEl = $('<p>'); 
+                windEl.text('Wind: ' + data.current.wind_speed + ' MPH');
+                
+                var humidEl = $('<p>'); 
+                humidEl.text('Humidity: ' + data.current.humidity + ' %'); 
+
+                var uvEl = $('<p>'); 
+                uvEl.text('UV Index: '); 
+
+                var uvIndexEl = $('<span>'); 
+                var uviValue = data.current.uvi.toFixed(2)
+                uvIndexEl.text(uviValue); 
+                uvIndexEl.attr('id', 'uv-value'); 
+
+                switch (true) {
+                    case (uviValue >= 3 && uviValue < 5.99):
+                        var uviColor = 'yellow'; 
+                        break; 
+                    case (uviValue >= 6 && uviValue < 7.99):
+                        var uviColor = 'orange'; 
+                        break;
+                    case (uviValue >= 8 && uviValue < 10.99):
+                        var uviColor = 'red';
+                        break;  
+                    case (uviValue >= 11):
+                        var uviColor = 'purple'; 
+                        break; 
+                    default:   
+                        var uviColor = 'green';                    
+                }
+
+                (uviColor == 'yellow') ?
+                uvIndexEl.attr('style', 'color:black;background-color:' + uviColor) :
+                uvIndexEl.attr('style', 'color:white;background-color:' + uviColor)                
+
+                cityDateEl.append(iconEl); 
+                uvEl.append(uvIndexEl); 
+
+                currentForcastEl.append(cityDateEl); 
+                currentForcastEl.append(tempEl); 
+                currentForcastEl.append(windEl); 
+                currentForcastEl.append(humidEl); 
+                currentForcastEl.append(uvEl); 
+                
+                forecast5daysEl.empty(); 
+
+                var startNum = 0; 
+
+                for (var i = 0; i < data.daily.length; i++) {
+                    if (moment(data.daily[i].dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY") === moment(data.current.dt  - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY")) {
+                        var startNum = i + 1; 
+                        break; 
+                    }
+                }
+
+                for (var i = startNum; i < startNum + 5; i++) {
+                    var sectionEl = $('<div>'); 
+                    sectionEl.addClass('future-forecast'); 
+
+                    var cardEl = $('<div>'); 
+                    cardEl.addClass('card-section'); 
+
+                    var dateEl = $('<h3>'); 
+                    dateEl.text(moment(data.daily[i].dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY"));
+
+                    var iconEl = $('<img>'); 
+                    iconEl.attr('src', 'http://openweathermap.org/img/wn/' + data.daily[i].weather[0].icon + '.png');
+
+                    var tempEl = $('<p>'); 
+                    tempEl.text('Temp: ' + data.daily[i].temp.day + String.fromCodePoint('8451')); 
+
+                    var windEl = $('<p>'); 
+                    windEl.text('Wind: ' + data.daily[i].wind_speed + ' MPH'); 
+
+                    var humidEl = $('<p>'); 
+                    humidEl.text('Humidity: ' + data.current.humidity + ' %'); 
+
+                    dateEl.append(iconEl); 
+                    cardEl.append(dateEl); 
+                    cardEl.append(tempEl); 
+                    cardEl.append(windEl); 
+                    cardEl.append(humidEl); 
+                    sectionEl.append(cardEl); 
+                    forecast5daysEl.append(sectionEl); 
+
+                    if (saveHistory == true) {
+                        saveRecentSearch(cityName, state, country, lat, lon); 
+                        document.location.replace('./index.html#search-result'); 
+                    }
+
+                    cityNameEl.val(''); 
+                }
+            })
+        }
+    })
+}
+
+function getGeoCoding(city, state, country, saveHistory) {
+    var requestUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + city + ',' + state + ',' + country + '&limit=5&appid=' + apiKey; 
+
+    fetch(requestUrl).then(function(response){
+        if (response.ok) {
+            response.json().then(function(data){
+                if (data.length !== 0) { 
+                    lat = data[0].lat.toFixed(2); 
+                    lon = data[0].lon.toFixed(2); 
+                    city = data[0].name; 
+                    if (country == '') country = data[0].country; 
+
+                    searchWeather(city, state, country, lat, lon, saveHistory);
+                } else {
+                    displayMessage(`The city '${city}' is not existed.  Please try another city.`)
+                }
+            })
+        }
+    })
+}
+
+function activatePlacesSearch() {
+  var options = {types: ['(cities)']};
+  var input = document.getElementById('city-name'); 
+  var autocomplete = new google.maps.places.Autocomplete(input, options); 
 }
 
 function displayMessage(strMessage) {
-    messageEl.text(strMessage);  
-    messageEl.show(); 
+    errorMessageEl.text(strMessage);  
+    errorMessageEl.show(); 
 
-    setTimeout(function(){messageEl.hide()}, 1500); 
+    setTimeout(function(){errorMessageEl.hide()}, 3000); 
 }
 
-// delegate the event listener to the save buttons from the time block element
-//timeBlockEl.on('click', '.saveBtn', saveEvent);
+function expandRecentSearch(event) {
+    event.preventDefault(); 
+
+    if (expandIconEl.data('state') == 'expand') {
+        expandIconEl.attr('class', 'fa-solid fa-caret-right'); 
+        expandIconEl.data('state', 'shrink'); 
+        historyButtonsEl.attr('style', 'display:none'); 
+        recentSearchText.attr('style', 'border-bottom:2px solid black'); 
+    } else {
+        expandIconEl.attr('class', 'fa-solid fa-caret-down'); 
+        expandIconEl.data('state', 'expand'); 
+        historyButtonsEl.attr('style', 'display:block'); 
+        recentSearchText.attr('style', 'border-bottom:none'); 
+    }
+}
+
+searchButton.click(searchButtonClick); 
+expandIconEl.click(expandRecentSearch); 
+historyButtonsEl.click('.recent-btn', recentSearchClick); 
 
 initPage(); 
 
