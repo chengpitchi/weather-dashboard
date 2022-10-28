@@ -262,7 +262,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
 }
 
 function getGeoCoding(city, state, country, saveHistory) {
-    var requestUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + city + ',' + state + ',' + country + '&limit=5&appid=' + apiKey; 
+    var requestUrl = 'https://api.openweathermap.org/geo/1.0/direct?q=' + city + ',' + state + ',' + country + '&limit=5&appid=' + apiKey; 
 
     fetch(requestUrl).then(function(response){
         if (response.ok) {
