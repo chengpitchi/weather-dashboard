@@ -159,7 +159,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                 cityDateEl.text(cityString + ' (' + moment(data.current.dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY hh:mm A") + ')'); 
 
                 var iconEl = $('<img>'); 
-                iconEl.attr('src', 'http://openweathermap.org/img/wn/' + data.current.weather[0].icon + '.png')
+                iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.current.weather[0].icon + '.png')
 
                 var tempEl = $('<p>'); 
                 tempEl.text('Temp: ' + data.current.temp + String.fromCodePoint('8451'));
@@ -230,7 +230,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                     dateEl.text(moment(data.daily[i].dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY"));
 
                     var iconEl = $('<img>'); 
-                    iconEl.attr('src', 'http://openweathermap.org/img/wn/' + data.daily[i].weather[0].icon + '.png');
+                    iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.daily[i].weather[0].icon + '.png');
 
                     var tempEl = $('<p>'); 
                     tempEl.text('Temp: ' + data.daily[i].temp.day + String.fromCodePoint('8451')); 
