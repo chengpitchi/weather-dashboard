@@ -68,6 +68,7 @@ function saveRecentSearch(city, state, country, lat, lon){
 
     if (recentSearchList === null) recentSearchList = new Array(); 
 
+    // add the new item to the beginning of the search result 
     recentSearchList.unshift(item); 
 
     if (recentSearchList.length > 1) {
@@ -84,6 +85,7 @@ function saveRecentSearch(city, state, country, lat, lon){
 
     localStorage.setItem('recentSearch', JSON.stringify(recentSearchList)); 
 
+    // reload the recent search item
     renderRecentSearch(); 
 }
 
@@ -96,6 +98,7 @@ function searchButtonClick(event) {
 
     var nameArray = cityNameEl.val().trim().split(',');
     
+    // separate the city, state and country from the input
     switch (nameArray.length) {
         case 1:
             cityName = nameArray[0].trim(); 
@@ -107,12 +110,15 @@ function searchButtonClick(event) {
         case 3:
             cityName = nameArray[0].trim(); 
             country = nameArray[2].trim(); 
+            // only include state if the country is USA or Canada
             if (country == 'USA' || country == 'Canada') state = nameArray[1].trim(); 
             break;
     }
 
+    // rectify the country code of UK to GB
     if (country == 'UK') country = 'GB'; 
 
+    // if it's Autstrlia, remove the state code from the name of the city
     if (country == 'Australia') {
         var tempArr = cityName.split(' '); 
         
@@ -124,6 +130,7 @@ function searchButtonClick(event) {
         cityName = cityName.trim(); 
     }
 
+    // get geocode and search the weather
     getGeoCoding(cityName, state, country, true); 
 }
 
@@ -145,7 +152,8 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
  
     fetch(requestUrl).then(function(response){
         if (response.ok) {
-            response.json().then(function(data){                
+            response.json().then(function(data){  
+                // render current day forecast              
                 currentForcastEl.empty(); 
 
                 let cityString = ''; 
@@ -159,6 +167,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
 
                 var iconEl = $('<img>'); 
                 iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.current.weather[0].icon + '.png')
+                iconEl.attr('alt', 'Weather Icon'); 
 
                 var tempEl = $('<p>'); 
                 tempEl.text('Temp: ' + data.current.temp + String.fromCodePoint('8451'));
@@ -177,6 +186,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                 uvIndexEl.text(uviValue); 
                 uvIndexEl.attr('id', 'uv-value'); 
 
+                // set the color of uv index
                 switch (true) {
                     case (uviValue >= 3 && uviValue < 5.99):
                         var uviColor = 'yellow'; 
@@ -217,7 +227,8 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                         break; 
                     }
                 }
-
+                
+                // render future 5 days weather 
                 for (var i = startNum; i < startNum + 5; i++) {
                     var sectionEl = $('<div>'); 
                     sectionEl.addClass('future-forecast'); 
@@ -230,6 +241,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
 
                     var iconEl = $('<img>'); 
                     iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.daily[i].weather[0].icon + '.png');
+                    iconEl.attr('alt', 'Weather Icon'); 
 
                     var tempEl = $('<p>'); 
                     tempEl.text('Temp: ' + data.daily[i].temp.day + String.fromCodePoint('8451')); 
@@ -274,6 +286,7 @@ function getGeoCoding(city, state, country, saveHistory) {
 
                     searchWeather(city, state, country, lat, lon, saveHistory);
                 } else {
+                    // display message if the city name cannot be found
                     displayMessage(`The city '${city}' is not existed.  Please try another city.`)
                 }
             })
@@ -282,12 +295,14 @@ function getGeoCoding(city, state, country, saveHistory) {
 }
 
 function activatePlacesSearch() {
-  var options = {types: ['(cities)']};
-  var input = document.getElementById('city-name'); 
-  var autocomplete = new google.maps.places.Autocomplete(input, options); 
+    // auto-complete the city name 
+    var options = {types: ['(cities)']};
+    var input = document.getElementById('city-name'); 
+    var autocomplete = new google.maps.places.Autocomplete(input, options); 
 }
 
 function displayMessage(strMessage) {
+    // call for displaying the error message 
     errorMessageEl.text(strMessage);  
     errorMessageEl.show(); 
 
@@ -295,6 +310,7 @@ function displayMessage(strMessage) {
 }
 
 function expandRecentSearch(event) {
+    // function to expand and shrink the recent search section
     event.preventDefault(); 
 
     if (expandIconEl.data('state') == 'expand') {
