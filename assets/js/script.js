@@ -137,14 +137,16 @@ function searchButtonClick(event) {
 function recentSearchClick(event) {
     var btnClicked = $(event.target); 
 
-    searchWeather(btnClicked.data('city'), 
-                    btnClicked.data('state'), 
-                    btnClicked.data('country'), 
-                    btnClicked.data('lat'), 
-                    btnClicked.data('lon'), 
-                    false);
-    
-    window.location.href = '#search-result'; 
+    if (btnClicked.prop('localName') === 'button') {
+        searchWeather(btnClicked.data('city'), 
+                        btnClicked.data('state'), 
+                        btnClicked.data('country'), 
+                        btnClicked.data('lat'), 
+                        btnClicked.data('lon'), 
+                        false);
+        
+        window.location.href = '#search-result'; 
+    }
 }
 
 function searchWeather(cityName, state, country, lat, lon, saveHistory) {
@@ -163,7 +165,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                 cityString = `${cityName}, ${state}, ${country}`; 
 
                 var cityDateEl = $('<h2>'); 
-                cityDateEl.text(cityString + ' (' + moment(data.current.dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY hh:mm A") + ')'); 
+                cityDateEl.text(cityString + ' (' + moment.utc(data.current.dt + data.timezone_offset, 'X').format("DD MMM YYYY hh:mm A") + ')'); 
 
                 var iconEl = $('<img>'); 
                 iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.current.weather[0].icon + '.png')
@@ -222,7 +224,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                 var startNum = 0; 
 
                 for (var i = 0; i < data.daily.length; i++) {
-                    if (moment(data.daily[i].dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY") === moment(data.current.dt  - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY")) {
+                    if (moment.utc(data.daily[i].dt + data.timezone_offset, 'X').format("DD MMM YYYY") === moment.utc(data.current.dt + data.timezone_offset, 'X').format("DD MMM YYYY")) {
                         var startNum = i + 1; 
                         break; 
                     }
@@ -237,7 +239,7 @@ function searchWeather(cityName, state, country, lat, lon, saveHistory) {
                     cardEl.addClass('card-section'); 
 
                     var dateEl = $('<h3>'); 
-                    dateEl.text(moment(data.daily[i].dt - 37800 + data.timezone_offset, 'X').format("DD MMM YYYY"));
+                    dateEl.text(moment.utc(data.daily[i].dt + data.timezone_offset, 'X').format("DD MMM YYYY"));
 
                     var iconEl = $('<img>'); 
                     iconEl.attr('src', 'https://openweathermap.org/img/wn/' + data.daily[i].weather[0].icon + '.png');
@@ -331,4 +333,3 @@ expandIconEl.click(expandRecentSearch);
 historyButtonsEl.click('.recent-btn', recentSearchClick); 
 
 initPage(); 
-
