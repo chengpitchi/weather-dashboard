@@ -73,20 +73,28 @@ https://chengpitchi.github.io/weather-dashboard
 
 ![This is the first solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-1.png)
 <br>
+
 ![This is the second solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-2.png)
 <br>
+
 ![This is the third solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-4.png)
 <br>
+
 ![This is the fourth solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-3.png)
 <br>
+
 ![This is the fifth solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-5.png)
 <br>
+
 ![This is the sixth solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-6.png)
 <br>
+
 ![This is the seventh solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-7.png)
 <br>
+
 ![This is the eighth solution screenshot for Weather Dashboard](./assets/images/weather-dashboard-8.png)
 <br>
+
 
 ## Installation 
 
